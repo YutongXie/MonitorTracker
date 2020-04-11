@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    jobconfig:
+      driverClassName:
+      jdbc-url:
+      username:
+      password:
+      maximum-pool-size: 5
+      minimum-pool-size: 2
+    inputprocessor:
+      driverClassName:
+      jdbc-url:
+      username:
+      password:
+      maximum-pool-size: 5
+      minimum-pool-size: 2
+    outputprocessor:
+      driverClassName:
+      jdbc-url:
+      username:
+      password:
+      maximum-pool-size: 5
+      minimum-pool-size: 2
+    businessprocessor:
+      driverClassName:
+      jdbc-url:
+      username:
+      password:
+      maximum-pool-size: 5
+      minimum-pool-size: 2
+
+sql:
+  job_config:
+    parent:
+    detail:
