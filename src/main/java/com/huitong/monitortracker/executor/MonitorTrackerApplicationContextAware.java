@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MonitorTrackerApplicationContextAware implements ApplicationContextAware {
-    private ApplicationContext context;
+    private static ApplicationContext context;
 
     private MonitorTrackerApplicationContextAware(){}
     @Override
@@ -16,7 +16,7 @@ public class MonitorTrackerApplicationContextAware implements ApplicationContext
         this.context = applicationContext;
     }
 
-    public Object getBean(String beanName) {
+    public static Object getBean(String beanName) {
         return context.getBean(beanName);
     }
 }

@@ -28,7 +28,7 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
     }
 
     @Override
-    public List<MonitorTrackerJobDetailConfig> getJobDetailConfig() {
-        return jdbcTemplate.query(sql_job_config_detail, new MonitorTrackerJobDetailConfigRowMapper());
+    public List<MonitorTrackerJobDetailConfig> getJobDetailConfig(long jobId) {
+        return jdbcTemplate.query(sql_job_config_detail,new Object[]{jobId}, new MonitorTrackerJobDetailConfigRowMapper());
     }
 }

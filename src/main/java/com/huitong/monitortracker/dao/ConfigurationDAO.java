@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ConfigurationDAO {
     List<MonitorTrackerJobConfigs> getJobConfig();
-    List<MonitorTrackerJobDetailConfig> getJobDetailConfig();
+    List<MonitorTrackerJobDetailConfig> getJobDetailConfig(long jobId);
 }
