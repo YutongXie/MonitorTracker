@@ -1,7 +1,7 @@
 package com.huitong.monitortracker.processor.customize.input;
 
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachInputProcessorDAO;
-import com.huitong.monitortracker.entity.NumberUpperLimitBreachStatistic;
+import com.huitong.monitortracker.entity.NumberUpperLimitBreachMetaData;
 import com.huitong.monitortracker.executor.ExecutorThreadLocal;
 import com.huitong.monitortracker.processor.InputProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ public class NumberUpperLimitBreachInputProcessor implements InputProcessor {
 
     @Override
     public void execute() {
-        List<NumberUpperLimitBreachStatistic> statisticList = inputProcessorDAO.getStatistic();
+        List<NumberUpperLimitBreachMetaData> statisticList = inputProcessorDAO.getMetaData();
         ExecutorThreadLocal.setInputData(statisticList);
     }
 }

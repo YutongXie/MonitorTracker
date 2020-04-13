@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 @Component
-public class MonitorTrackerExecutor {
+public class MonitorTrackerExecutor{
     private final Logger logger = LoggerFactory.getLogger(MonitorTrackerExecutor.class);
     @Autowired
     private ConfigurationDAO configurationDAO;

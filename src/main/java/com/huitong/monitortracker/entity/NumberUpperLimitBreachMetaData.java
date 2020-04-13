@@ -1,12 +1,13 @@
 package com.huitong.monitortracker.entity;
 
-public class NumberUpperLimitBreachStatistic {
+public class NumberUpperLimitBreachMetaData {
     private String schemaName;
     private String tableName;
     private String columnName;
     private String dataType;
     private Long dataLength;
     private Long dataPrecision;
+    private Long dataScale;
 
     public String getSchemaName() {
         return schemaName;
@@ -54,5 +55,13 @@ public class NumberUpperLimitBreachStatistic {
 
     public void setDataPrecision(Long dataPrecision) {
         this.dataPrecision = dataPrecision;
+    }
+
+    public Long getDataScale() {
+        return dataScale;
+    }
+
+    public void setDataScale(Long dataScale) {
+        this.dataScale = dataScale;
     }
 }

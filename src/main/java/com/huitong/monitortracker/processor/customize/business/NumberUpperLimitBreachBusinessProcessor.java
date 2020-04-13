@@ -2,10 +2,10 @@ package com.huitong.monitortracker.processor.customize.business;
 
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachBusinessProcessorDAO;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachResult;
-import com.huitong.monitortracker.entity.NumberUpperLimitBreachStatistic;
+import com.huitong.monitortracker.entity.NumberUpperLimitBreachMetaData;
+import com.huitong.monitortracker.entity.OracleColumnType;
 import com.huitong.monitortracker.executor.ExecutorThreadLocal;
 import com.huitong.monitortracker.processor.BusinessProcessor;
-import jdk.internal.org.objectweb.asm.Handle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +22,8 @@ public class NumberUpperLimitBreachBusinessProcessor implements BusinessProcesso
     public void execute() {
         Object obj = ExecutorThreadLocal.getInputData();
         if(obj instanceof List) {
-            if(((List) obj).size() > 0 && ((List) obj).get(0) instanceof NumberUpperLimitBreachStatistic) {
-                Map<String, List<NumberUpperLimitBreachStatistic>> statisticMap = classificationToMap((List<NumberUpperLimitBreachStatistic>) obj);
+            if(((List) obj).size() > 0 && ((List) obj).get(0) instanceof NumberUpperLimitBreachMetaData) {
+                Map<String, List<NumberUpperLimitBreachMetaData>> statisticMap = classificationToMap((List<NumberUpperLimitBreachMetaData>) obj);
                 List<NumberUpperLimitBreachResult> resultList = new ArrayList<>();
                 statisticMap.forEach((key, value) ->{
                    String sql = generateCurrentValueSQL(value);
@@ -57,23 +57,32 @@ public class NumberUpperLimitBreachBusinessProcessor implements BusinessProcesso
         return result;
     }
 
-    private BigDecimal getLimitValue(List<NumberUpperLimitBreachStatistic> statisticList, String columnName) {
-        for (NumberUpperLimitBreachStatistic statistic : statisticList) {
-            if (columnName.equalsIgnoreCase(statistic.getColumnName())) {
-                Long dataLength = Optional.ofNullable(statistic.getDataLength()).orElse(0L);
-                Long dataPrecision = Optional.ofNullable(statistic.getDataPrecision()).orElse(0L);
-                return generateLimitValue(dataLength, dataPrecision);
+    private BigDecimal getLimitValue(List<NumberUpperLimitBreachMetaData> metaDataList, String columnName) {
+        for (NumberUpperLimitBreachMetaData metaData : metaDataList) {
+            if (columnName.equalsIgnoreCase(metaData.getColumnName())) {
+                String dataType = metaData.getDataType();
+                if(OracleColumnType.BINARY_DOUBLE.name().equalsIgnoreCase(dataType)) {
+                    //
+                } else if(OracleColumnType.BINARY_DOUBLE.name().equalsIgnoreCase(dataType)) {
+                    //
+                } else if(OracleColumnType.FLOAT.name().equalsIgnoreCase(dataType)) {
+                    //
+                } else if(OracleColumnType.NUMBER.name().equalsIgnoreCase(dataType)) {
+                    Long dataScale = Optional.ofNullable(metaData.getDataScale()).orElse(0L);
+                    Long dataPrecision = Optional.ofNullable(metaData.getDataPrecision()).orElse(0L);
+                    return generateLimitValue(dataPrecision, dataScale);
+                }
             }
         }
         return BigDecimal.ZERO;
     }
 
-    private BigDecimal generateLimitValue(Long dataLength, Long dataPrecision) {
+    private BigDecimal generateLimitValue(Long dataPrecision, Long dataScale) {
         BigDecimal result = BigDecimal.ZERO;
-        if(dataLength <= dataPrecision)
+        if(dataPrecision <= dataScale)
             return result;
         StringBuffer sb = new StringBuffer();
-        long length = dataLength - dataPrecision;
+        long length = dataPrecision - dataScale;
         for (long i = 0; i < length; i++) {
             sb.append("9");
         }
@@ -83,29 +92,29 @@ public class NumberUpperLimitBreachBusinessProcessor implements BusinessProcesso
         return result;
     }
 
-    private String generateCurrentValueSQL(List<NumberUpperLimitBreachStatistic> statisticList) {
+    private String generateCurrentValueSQL(List<NumberUpperLimitBreachMetaData> metaDataList) {
         StringBuffer sb = new StringBuffer();
-        for (NumberUpperLimitBreachStatistic statistic : statisticList) {
+        for (NumberUpperLimitBreachMetaData metaData : metaDataList) {
             if(sb.length() > 0) {
                 sb.append("||';'||");
             }
-            sb.append("'").append(statistic.getColumnName()).append("-'||").append("MAX(").append(statistic.getColumnName()).append(") ");
+            sb.append("'").append(metaData.getColumnName()).append("-'||").append("MAX(").append(metaData.getColumnName()).append(") ");
         }
-        return "SELECT " + sb.toString() + " FROM " + statisticList.get(0).getSchemaName() + "." + statisticList.get(0).getTableName();
+        return "SELECT " + sb.toString() + " FROM " + metaDataList.get(0).getSchemaName() + "." + metaDataList.get(0).getTableName();
     }
 
-    public Map<String, List<NumberUpperLimitBreachStatistic>> classificationToMap(List<NumberUpperLimitBreachStatistic> statisticList) {
-        Map<String, List<NumberUpperLimitBreachStatistic>> statisticMap = new HashMap<>();
-        for (NumberUpperLimitBreachStatistic statistic : statisticList) {
-            String key = statistic.getSchemaName() + "_" + statistic.getTableName();
-            if(statisticMap.containsKey(key)) {
-                statisticMap.get(key).add(statistic);
+    public Map<String, List<NumberUpperLimitBreachMetaData>> classificationToMap(List<NumberUpperLimitBreachMetaData> metaDataList) {
+        Map<String, List<NumberUpperLimitBreachMetaData>> metaDataMap = new HashMap<>();
+        for (NumberUpperLimitBreachMetaData metaData : metaDataList) {
+            String key = metaData.getSchemaName() + "_" + metaData.getTableName();
+            if(metaDataMap.containsKey(key)) {
+                metaDataMap.get(key).add(metaData);
             } else {
-                List<NumberUpperLimitBreachStatistic> list = new ArrayList<>();
-                list.add(statistic);
-                statisticMap.put(key, list);
+                List<NumberUpperLimitBreachMetaData> list = new ArrayList<>();
+                list.add(metaData);
+                metaDataMap.put(key, list);
             }
         }
-        return statisticMap;
+        return metaDataMap;
     }
 }

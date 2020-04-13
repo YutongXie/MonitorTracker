@@ -41,4 +41,6 @@ sql:
     number_upper_limit_breach:
       get_last_result: SELECT * FROM NUMBER_UPPER_LIMIT_BREACH WHERE ACTIVE = 'A'
       inactive_old_result: UPDATE NUMBER_UPPER_LIMIT_BREACH SET ACTIVE = 'I' WHERE ACTIVE = 'A'
-      insert_new_result: INSERT INTO NUMBER_UPPER_LIMIT_BREACH(SCHEMA_NAME, TABLE_NAME, COLUMN_NAME, CURRENT_VALUE, LIMIT_VALUE, BURN_RATE, DAYS_REACH_80, DAYS_REACH_FULL, STATUS, CREATE_TIME) VALUES(:schemaName, :tableName, :columnName, :currentValue, :limitValue, :burnRate, :daysReach80%, :daysReachFull, :active, sysdate)
+      insert_new_result: "INSERT INTO NUMBER_UPPER_LIMIT_BREACH(SCHEMA_NAME, TABLE_NAME, COLUMN_NAME, CURRENT_VALUE, LIMIT_VALUE,
+                          BURN_RATE, DAYS_REACH_80, STATUS, CREATE_TIME) VALUES(:schemaName, :tableName, :columnName, :currentValue,
+                          :limitValue, :burnRate, :daysReach80%, :active, sysdate)"

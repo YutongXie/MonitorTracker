@@ -13,8 +13,7 @@ public class NumberUpperLimitBreachResult {
     private String active;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
-    private int daysReach80Percent;
-    private int daysReachFull;
+    private String daysReach80Percent;
     private String usePercent;
 
     public String getSchemaName() {
@@ -89,20 +88,12 @@ public class NumberUpperLimitBreachResult {
         this.updateTime = updateTime;
     }
 
-    public int getDaysReach80Percent() {
+    public String getDaysReach80Percent() {
         return daysReach80Percent;
     }
 
-    public void setDaysReach80Percent(int daysReach80Percent) {
+    public void setDaysReach80Percent(String daysReach80Percent) {
         this.daysReach80Percent = daysReach80Percent;
-    }
-
-    public int getDaysReachFull() {
-        return daysReachFull;
-    }
-
-    public void setDaysReachFull(int daysReachFull) {
-        this.daysReachFull = daysReachFull;
     }
 
     public String getUsePercent() {

@@ -1,7 +1,7 @@
 package com.huitong.monitortracker.dao;
 
-import com.huitong.monitortracker.dao.rowmapper.NumberUpperLimitBreachStatisticRowMapper;
-import com.huitong.monitortracker.entity.NumberUpperLimitBreachStatistic;
+import com.huitong.monitortracker.dao.rowmapper.NumberUpperLimitBreachMetaDataRowMapper;
+import com.huitong.monitortracker.entity.NumberUpperLimitBreachMetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +16,9 @@ public class NumberUpperLimitBreachInputProcessorDAOImpl implements NumberUpperL
     private JdbcTemplate jdbcTemplate;
 
     @Value("${sql.inputprocessor.number_upper_limit_breach}")
-    private String sql_get_statistic;
+    private String sql_get_metadata;
     @Override
-    public List<NumberUpperLimitBreachStatistic> getStatistic() {
-        return jdbcTemplate.query(sql_get_statistic, new NumberUpperLimitBreachStatisticRowMapper());
+    public List<NumberUpperLimitBreachMetaData> getMetaData() {
+        return jdbcTemplate.query(sql_get_metadata, new NumberUpperLimitBreachMetaDataRowMapper());
     }
 }

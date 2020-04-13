@@ -1,9 +1,9 @@
 package com.huitong.monitortracker.dao;
 
-import com.huitong.monitortracker.entity.NumberUpperLimitBreachStatistic;
+import com.huitong.monitortracker.entity.NumberUpperLimitBreachMetaData;
 
 import java.util.List;
 
 public interface NumberUpperLimitBreachInputProcessorDAO {
-    List<NumberUpperLimitBreachStatistic> getStatistic();
+    List<NumberUpperLimitBreachMetaData> getMetaData();
 }

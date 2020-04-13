@@ -11,6 +11,12 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public class NumberUpperLimitBreachOutputProcessor implements OutputProcessor {
+    private final String DAYS_REACH_TO_80_PERCENT_MORE_THAN_90 = "> 90";
+    private final String DAYS_REACH_TO_80_PERCENT_MORE_THAN_60 = "> 60";
+    private final String DAYS_REACH_TO_80_PERCENT_MORE_THAN_30 = "> 30";
+    private final String DAYS_REACH_TO_80_PERCENT_MORE_THAN_15 = "> 15";
+    private final String DAYS_REACH_TO_80_PERCENT_LESS_THAN_15 = "< 15";
+
     @Autowired
     private NumberUpperLimitBreachOutputProcessorDAO outputProcessorDAO;
     @Value("sql.outputprocessor.insert_new_result")
@@ -27,9 +33,8 @@ public class NumberUpperLimitBreachOutputProcessor implements OutputProcessor {
                 for (NumberUpperLimitBreachResult result : currentResultList) {
                     BigDecimal burnRate = generateBurnRate(lastResultMap.get(result.getSchemaName() + "_" + result.getTableName() + "_" + result.getColumnName()), result);
                     result.setBurnRate(burnRate);
-                    result.setUsePercent(calculateUsePencent(result.getCurrentValue(), result.getLimitValue()));
+                    result.setUsePercent(calculateUsePercent(result.getCurrentValue(), result.getLimitValue()));
                     result.setDaysReach80Percent(calculateDaysReach80Percent(result.getBurnRate(), result.getLimitValue()));
-                    result.setDaysReachFull(calculateDaysReachFull(result.getBurnRate(), result.getLimitValue()));
                 }
                 outputProcessorDAO.save((String[]) generateInsertSQL(currentResultList).toArray());
             }
@@ -45,8 +50,7 @@ public class NumberUpperLimitBreachOutputProcessor implements OutputProcessor {
                     .replace(":currentValue", result.getCurrentValue() + "")
                     .replace(":limitValue", result.getLimitValue() + "")
                     .replace(":burnRate", result.getBurnRate() + "")
-                    .replace(":daysReach80%", result.getDaysReach80Percent() + "")
-                    .replace(":daysReachFull", result.getDaysReachFull() + "")
+                    .replace(":daysReach80%", "'" + result.getDaysReach80Percent() + "'")
                     .replace(":active", "'" + result.getActive() + "'");
             sqlList.add(sql);
         }
@@ -59,16 +63,29 @@ public class NumberUpperLimitBreachOutputProcessor implements OutputProcessor {
         return currentValue.subtract(lastValue);
     }
 
-    private String calculateUsePencent(BigDecimal currentValue, BigDecimal limitValue) {
-        return currentValue.divide(limitValue).setScale(BigDecimal.ROUND_UP).multiply(new BigDecimal(100)) + "%";
+    private String calculateUsePercent(BigDecimal currentValue, BigDecimal limitValue) {
+        if(BigDecimal.ZERO.compareTo(currentValue) == 0)
+            return "0.00%";
+        return currentValue.divide(limitValue, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%";
     }
 
-    private int calculateDaysReach80Percent(BigDecimal burnRate, BigDecimal limitValue) {
-        return limitValue.divide(burnRate).multiply(new BigDecimal(0.8)).setScale(BigDecimal.ROUND_UP).intValue();
-    }
+    private String calculateDaysReach80Percent(BigDecimal burnRate, BigDecimal limitValue) {
+        if(BigDecimal.ZERO.compareTo(burnRate) == 0) {
+            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_90;
+        }
 
-    private int calculateDaysReachFull(BigDecimal burnRate, BigDecimal limitValue) {
-        return limitValue.divide(burnRate).setScale(BigDecimal.ROUND_UP).intValue();
+        long days = limitValue.divide(burnRate, 0, BigDecimal.ROUND_HALF_UP).longValue();
+        if(days > 90) {
+            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_90;
+        } else if(days > 60) {
+            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_60;
+        } else if(days > 30) {
+            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_30;
+        } else if(days >= 15) {
+            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_15;
+        } else {
+            return DAYS_REACH_TO_80_PERCENT_LESS_THAN_15;
+        }
     }
 
     public Map<String, NumberUpperLimitBreachResult> classificationToMap(List<NumberUpperLimitBreachResult> resultList) {
