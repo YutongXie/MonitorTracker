@@ -15,7 +15,7 @@ public class NumberUpperLimitBreachResultRowMapper implements RowMapper {
         result.setColumnName(resultSet.getString("COLUMN_NAME"));
         result.setActive(resultSet.getString("ACTIVE"));
         result.setCurrentValue(resultSet.getBigDecimal("CURRENT_VALUE"));
-        result.setLimitValue(resultSet.getBigDecimal("LIMIT_VALUE"));
+        result.setLimitValue(resultSet.getString("LIMIT_VALUE"));
         result.setCreateTime(resultSet.getTimestamp("CREATE_TIME").toLocalDateTime());
         if(resultSet.getTimestamp("UPDATE_TIME") != null)
             result.setUpdateTime(resultSet.getTimestamp("UPDATE_TIME").toLocalDateTime());

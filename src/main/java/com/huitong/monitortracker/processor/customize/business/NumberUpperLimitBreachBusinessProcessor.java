@@ -57,28 +57,31 @@ public class NumberUpperLimitBreachBusinessProcessor implements BusinessProcesso
         return result;
     }
 
-    private BigDecimal getLimitValue(List<NumberUpperLimitBreachMetaData> metaDataList, String columnName) {
+    private String getLimitValue(List<NumberUpperLimitBreachMetaData> metaDataList, String columnName) {
         for (NumberUpperLimitBreachMetaData metaData : metaDataList) {
             if (columnName.equalsIgnoreCase(metaData.getColumnName())) {
                 String dataType = metaData.getDataType();
                 if(OracleColumnType.BINARY_DOUBLE.name().equalsIgnoreCase(dataType)) {
-                    //
-                } else if(OracleColumnType.BINARY_DOUBLE.name().equalsIgnoreCase(dataType)) {
-                    //
+                    return OracleColumnType.BINARY_DOUBLE.getMaxValue();
+                } else if(OracleColumnType.BINARY_FLOAT.name().equalsIgnoreCase(dataType)) {
+                    return OracleColumnType.BINARY_FLOAT.getMaxValue();
                 } else if(OracleColumnType.FLOAT.name().equalsIgnoreCase(dataType)) {
-                    //
+                    return OracleColumnType.FLOAT.getMaxValue();
                 } else if(OracleColumnType.NUMBER.name().equalsIgnoreCase(dataType)) {
                     Long dataScale = Optional.ofNullable(metaData.getDataScale()).orElse(0L);
                     Long dataPrecision = Optional.ofNullable(metaData.getDataPrecision()).orElse(0L);
-                    return generateLimitValue(dataPrecision, dataScale);
+                    return generateLimitValueForNumberType(dataPrecision, dataScale);
                 }
             }
         }
-        return BigDecimal.ZERO;
+        return "0";
     }
 
-    private BigDecimal generateLimitValue(Long dataPrecision, Long dataScale) {
-        BigDecimal result = BigDecimal.ZERO;
+    private String generateLimitValueForNumberType(Long dataPrecision, Long dataScale) {
+        String result = OracleColumnType.NUMBER.getMaxValue();
+        if(dataPrecision == 0) {
+            return result;
+        }
         if(dataPrecision <= dataScale)
             return result;
         StringBuffer sb = new StringBuffer();
@@ -86,8 +89,10 @@ public class NumberUpperLimitBreachBusinessProcessor implements BusinessProcesso
         for (long i = 0; i < length; i++) {
             sb.append("9");
         }
-        if(sb.length() > 0) {
-            result = new BigDecimal(sb.toString());
+        if(sb.length() > 5) {
+            result = OracleColumnType.NUMBER.getDisplayFormat() + (sb.length() -1);
+        } else {
+            result = sb.toString();
         }
         return result;
     }

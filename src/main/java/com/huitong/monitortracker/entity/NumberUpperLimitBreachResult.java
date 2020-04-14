@@ -8,7 +8,7 @@ public class NumberUpperLimitBreachResult {
     private String tableName;
     private String columnName;
     private BigDecimal currentValue;
-    private BigDecimal limitValue;
+    private String limitValue;
     private BigDecimal burnRate;
     private String active;
     private LocalDateTime createTime;
@@ -48,11 +48,11 @@ public class NumberUpperLimitBreachResult {
         this.currentValue = currentValue;
     }
 
-    public BigDecimal getLimitValue() {
+    public String getLimitValue() {
         return limitValue;
     }
 
-    public void setLimitValue(BigDecimal limitValue) {
+    public void setLimitValue(String limitValue) {
         this.limitValue = limitValue;
     }
 

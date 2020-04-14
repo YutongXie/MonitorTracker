@@ -48,7 +48,7 @@ public class NumberUpperLimitBreachOutputProcessor implements OutputProcessor {
                     .replace(":tableName", "'" + result.getTableName() + "'")
                     .replace(":columnName", "'" + result.getColumnName() + "'")
                     .replace(":currentValue", result.getCurrentValue() + "")
-                    .replace(":limitValue", result.getLimitValue() + "")
+                    .replace(":limitValue", "'" + result.getLimitValue() + "'")
                     .replace(":burnRate", result.getBurnRate() + "")
                     .replace(":daysReach80%", "'" + result.getDaysReach80Percent() + "'")
                     .replace(":active", "'" + result.getActive() + "'");
@@ -63,18 +63,47 @@ public class NumberUpperLimitBreachOutputProcessor implements OutputProcessor {
         return currentValue.subtract(lastValue);
     }
 
-    private String calculateUsePercent(BigDecimal currentValue, BigDecimal limitValue) {
+    private String calculateUsePercent(BigDecimal currentValue, String limitValue) {
         if(BigDecimal.ZERO.compareTo(currentValue) == 0)
             return "0.00%";
-        return currentValue.divide(limitValue, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%";
+        if("0".equalsIgnoreCase(limitValue)) {
+            return "0.00%";
+        }
+        if(limitValue.contains("9.99...")) {
+            int index = limitValue.indexOf("E");
+            int count = Integer.valueOf(limitValue.substring(index + 1));
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < count; i++) {
+                sb.append(9);
+            }
+            limitValue = limitValue.replace("...", sb.toString());
+        }
+
+        BigDecimal limitValueNum = new BigDecimal(limitValue);
+        return currentValue.divide(limitValueNum, 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%";
     }
 
-    private String calculateDaysReach80Percent(BigDecimal burnRate, BigDecimal limitValue) {
+    private String calculateDaysReach80Percent(BigDecimal burnRate, String limitValue) {
         if(BigDecimal.ZERO.compareTo(burnRate) == 0) {
             return DAYS_REACH_TO_80_PERCENT_MORE_THAN_90;
         }
 
-        long days = limitValue.divide(burnRate, 0, BigDecimal.ROUND_HALF_UP).longValue();
+        if("0".equalsIgnoreCase(limitValue)) {
+            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_90;
+        }
+        if(limitValue.contains("9.99...")) {
+            int index = limitValue.indexOf("E");
+            int count = Integer.valueOf(limitValue.substring(index + 1));
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < count; i++) {
+                sb.append(9);
+            }
+            limitValue = limitValue.replace("...", sb.toString());
+        }
+
+        BigDecimal limitValueNum = new BigDecimal(limitValue);
+
+        long days = limitValueNum.divide(burnRate, 0, BigDecimal.ROUND_HALF_UP).longValue();
         if(days > 90) {
             return DAYS_REACH_TO_80_PERCENT_MORE_THAN_90;
         } else if(days > 60) {
