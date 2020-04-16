@@ -4,6 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 @SpringBootApplication
 @ComponentScan
 public class MonitorTrackerApplication {
