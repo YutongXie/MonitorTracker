@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html  lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Number Upper Limit Breach Report</title>
+</head>
+<body>
+<table>
+    <table>
+        <tr>
+            <th>Schema Name</th>
+            <th>Table Name</th>
+            <th>Column Name</th>
+            <th>Burn Rate</th>
+            <th>Use Percent</th>
+            <th>Days Reach to 80%</th>
+        </tr>
+        <tr th:each="result:${alertData}">
+            <td th:text="${result.schemaName}"></td>
+            <td th:text="${result.tableName}"></td>
+            <td th:text="${result.columnName}"></td>
+            <td th:text="${result.burnRate}"></td>
+            <td th:text="${result.usePercent}"></td>
+            <td th:text="${result.daysReach80Percent}"></td>
+        </tr>
+    </table>
+</table>
+</body>
+
+</html>

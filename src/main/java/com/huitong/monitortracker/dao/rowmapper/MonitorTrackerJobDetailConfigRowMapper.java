@@ -13,7 +13,11 @@ public class MonitorTrackerJobDetailConfigRowMapper implements RowMapper {
         detailConfig.setJobId(resultSet.getLong("JOB_ID"));
         detailConfig.setProcessorName(resultSet.getString("PROCESS_NAME"));
         detailConfig.setType(resultSet.getString("TYPE"));
-        detailConfig.setValue(resultSet.getString("VALUE"));
+        detailConfig.setValue1(resultSet.getString("VALUE1"));
+        detailConfig.setValue2(resultSet.getString("VALUE2"));
+        detailConfig.setValue3(resultSet.getString("VALUE3"));
+        detailConfig.setValue4(resultSet.getString("VALUE4"));
+        detailConfig.setValue5(resultSet.getString("VALUE5"));
         return detailConfig;
     }
 }

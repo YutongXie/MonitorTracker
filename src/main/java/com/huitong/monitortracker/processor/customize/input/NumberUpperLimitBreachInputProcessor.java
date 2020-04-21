@@ -1,6 +1,7 @@
 package com.huitong.monitortracker.processor.customize.input;
 
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachInputProcessorDAO;
+import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachMetaData;
 import com.huitong.monitortracker.executor.ExecutorThreadLocal;
 import com.huitong.monitortracker.processor.InputProcessor;
@@ -13,7 +14,7 @@ public class NumberUpperLimitBreachInputProcessor implements InputProcessor {
     private NumberUpperLimitBreachInputProcessorDAO inputProcessorDAO;
 
     @Override
-    public void execute() {
+    public void execute(MonitorTrackerJobDetailConfig config) {
         List<NumberUpperLimitBreachMetaData> statisticList = inputProcessorDAO.getMetaData();
         ExecutorThreadLocal.setInputData(statisticList);
     }

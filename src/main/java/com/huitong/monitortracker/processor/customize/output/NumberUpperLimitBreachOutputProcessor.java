@@ -1,6 +1,7 @@
 package com.huitong.monitortracker.processor.customize.output;
 
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachOutputProcessorDAO;
+import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachMetaData;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachResult;
 import com.huitong.monitortracker.executor.ExecutorThreadLocal;
@@ -19,12 +20,13 @@ public class NumberUpperLimitBreachOutputProcessor implements OutputProcessor {
     private Logger logger = LoggerFactory.getLogger(NumberUpperLimitBreachOutputProcessor.class);
 
     @Override
-    public void execute() {
+    public void execute(MonitorTrackerJobDetailConfig config) {
         try {
             List<NumberUpperLimitBreachResult> inputData = getInputData();
             if(!CollectionUtils.isEmpty(inputData)) {
                 processInputData(inputData);
             }
+            ExecutorThreadLocal.setAlertProcessorThreadLocal(inputData);
         } catch (Exception ex) {
             logger.error("NumberUpperLimitBreachOutputProcessor - failed to process.", ex);
         }

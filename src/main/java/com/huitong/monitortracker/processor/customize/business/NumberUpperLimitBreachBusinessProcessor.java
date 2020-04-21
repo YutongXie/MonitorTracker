@@ -1,6 +1,7 @@
 package com.huitong.monitortracker.processor.customize.business;
 
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachBusinessProcessorDAO;
+import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachResult;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachMetaData;
 import com.huitong.monitortracker.entity.OracleColumnType;
@@ -21,7 +22,7 @@ public class NumberUpperLimitBreachBusinessProcessor implements BusinessProcesso
     @Autowired
     private NumberUpperLimitBreachBusinessProcessorDAO businessProcessorDAO;
     @Override
-    public void execute() {
+    public void execute(MonitorTrackerJobDetailConfig config) {
         try {
             List<NumberUpperLimitBreachMetaData> inputData = getInputData();
             if(!CollectionUtils.isEmpty(inputData)) {

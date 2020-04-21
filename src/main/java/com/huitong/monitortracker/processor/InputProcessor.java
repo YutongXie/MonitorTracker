@@ -1,5 +1,7 @@
 package com.huitong.monitortracker.processor;
 
+import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
+
 public interface InputProcessor {
-    void execute();
+    void execute(MonitorTrackerJobDetailConfig config);
 }

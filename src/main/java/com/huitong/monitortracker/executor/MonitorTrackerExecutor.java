@@ -7,16 +7,18 @@ import com.huitong.monitortracker.processor.AlertProcessor;
 import com.huitong.monitortracker.processor.BusinessProcessor;
 import com.huitong.monitortracker.processor.InputProcessor;
 import com.huitong.monitortracker.processor.OutputProcessor;
-import javafx.scene.control.Alert;
+import com.huitong.monitortracker.utils.MonitorTrackerConfigurationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 @Component
-public class MonitorTrackerExecutor{
+public class MonitorTrackerExecutor implements ApplicationRunner {
     private final Logger logger = LoggerFactory.getLogger(MonitorTrackerExecutor.class);
     @Autowired
     private ConfigurationDAO configurationDAO;
@@ -27,17 +29,17 @@ public class MonitorTrackerExecutor{
 
     private void execute() {
         //1. get job config from DB
-        List<MonitorTrackerJobConfigs> monitorTrackerJobConfigsList = getJobConfig();
-        for (MonitorTrackerJobConfigs monitorTrackerJobConfigs : monitorTrackerJobConfigsList) {
-            List<MonitorTrackerJobDetailConfig> monitorTrackerJobDetailConfigList = getJobDetailConfig(monitorTrackerJobConfigs.getJobId());
+        List<MonitorTrackerJobConfigs> jobConfigsList = getJobConfig();
+        for (MonitorTrackerJobConfigs monitorTrackerJobConfigs : jobConfigsList) {
+            List<MonitorTrackerJobDetailConfig> detailConfigList = getJobDetailConfig(monitorTrackerJobConfigs.getJobId());
             //2. Initial processor base on Job config
             try {
                 initialProcess(monitorTrackerJobConfigs);
-                inputProcessor.execute();
-                businessProcessor.execute();
-                outputProcessor.execute();
+                inputProcessor.execute(MonitorTrackerConfigurationUtils.getInputProcessorJobDetailConfig(detailConfigList));
+                businessProcessor.execute(MonitorTrackerConfigurationUtils.getBusinessProcessorJobDetailConfig(detailConfigList));
+                outputProcessor.execute(MonitorTrackerConfigurationUtils.getOutputProcessorJobDetailConfig(detailConfigList));
                 if(alertProcessor != null)
-                    alertProcessor.execute();
+                    alertProcessor.execute(MonitorTrackerConfigurationUtils.getAlertProcessorJobDetailConfig(detailConfigList));
             } catch (Exception ex) {
                 logger.error("Execute Monitor Tracker job failed. JobConfig is:{}, exception:{}", monitorTrackerJobConfigs.toString(), ex);
             }
@@ -87,5 +89,10 @@ public class MonitorTrackerExecutor{
             if(alertProcessor == null)
                 throw new Exception("Invalid AlertProcessor setup");
         }
+    }
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        execute();
     }
 }

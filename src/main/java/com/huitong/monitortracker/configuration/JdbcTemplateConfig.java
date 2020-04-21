@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
-@Configuration
+//@Configuration
 public class JdbcTemplateConfig {
 
     @Bean(name = "jobConfigJdbcTemplate")
