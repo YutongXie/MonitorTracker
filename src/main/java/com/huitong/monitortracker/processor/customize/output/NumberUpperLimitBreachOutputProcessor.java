@@ -6,39 +6,41 @@ import com.huitong.monitortracker.entity.NumberUpperLimitBreachMetaData;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachResult;
 import com.huitong.monitortracker.executor.ExecutorThreadLocal;
 import com.huitong.monitortracker.processor.OutputProcessor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
-
+@Component
+@Slf4j
 public class NumberUpperLimitBreachOutputProcessor implements OutputProcessor {
-    private Logger logger = LoggerFactory.getLogger(NumberUpperLimitBreachOutputProcessor.class);
 
     @Override
     public void execute(MonitorTrackerJobDetailConfig config) {
         try {
             List<NumberUpperLimitBreachResult> inputData = getInputData();
             if(!CollectionUtils.isEmpty(inputData)) {
-                processInputData(inputData);
+                processInputData(inputData, config);
             }
-            ExecutorThreadLocal.setAlertProcessorThreadLocal(inputData);
+            ExecutorThreadLocal.setOutputData(inputData);
         } catch (Exception ex) {
-            logger.error("NumberUpperLimitBreachOutputProcessor - failed to process.", ex);
+            log.error("NumberUpperLimitBreachOutputProcessor - failed to process.", ex);
         }
     }
 
-    private void processInputData(List<NumberUpperLimitBreachResult> inputData) {
+    private void processInputData(List<NumberUpperLimitBreachResult> inputData, MonitorTrackerJobDetailConfig config) {
         ForkJoinPool pool = null;
         try {
             Map<String, List<NumberUpperLimitBreachResult>> lastResultMap = classificationToMap(inputData);
             List<List<NumberUpperLimitBreachResult>> fullList = new ArrayList<>(lastResultMap.values());
             pool = ForkJoinPool.commonPool();
-            pool.invoke(new NumberUpperLimitBreachForkJoinOutputExecutor(0, fullList.size(), fullList));
+            pool.invoke(new NumberUpperLimitBreachForkJoinOutputExecutor(0, fullList.size(), fullList, config));
         } finally {
             if(pool != null) {
                 pool.shutdown();

@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface NumberUpperLimitBreachOutputProcessorDAO {
     List<NumberUpperLimitBreachResult> getLastResult();
-    void inactiveLastResult();
-    void save(String[] sql);
+    void inactiveLastResult(String schemaName);
+    void save(List<NumberUpperLimitBreachResult> resultList);
 }

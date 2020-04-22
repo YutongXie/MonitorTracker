@@ -2,6 +2,7 @@ package com.huitong.monitortracker.processor.customize.output;
 
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachBusinessProcessorDAO;
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachOutputProcessorDAO;
+import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +25,16 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
     private int endIndex;
     private List<List<NumberUpperLimitBreachResult>> fullResultList;
     private NumberUpperLimitBreachOutputProcessorDAO outputProcessorDAO;
+    private MonitorTrackerJobDetailConfig config;
 
     @Value("sql.outputprocessor.insert_new_result")
     private String sql_insert_new_result;
 
-    public NumberUpperLimitBreachForkJoinOutputExecutor(int startIndex, int endIndex, List<List<NumberUpperLimitBreachResult>> fullResultList) {
+    public NumberUpperLimitBreachForkJoinOutputExecutor(int startIndex, int endIndex, List<List<NumberUpperLimitBreachResult>> fullResultList, MonitorTrackerJobDetailConfig config) {
         this.startIndex = startIndex;
         this.endIndex = endIndex;
         this.fullResultList = fullResultList;
+        this.config = config;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
             for (int i = startIndex; i < endIndex; i++) {
                 List<NumberUpperLimitBreachResult> currentResultList = fullResultList.get(i);
                 List<NumberUpperLimitBreachResult> lastResult = outputProcessorDAO.getLastResult();
-                outputProcessorDAO.inactiveLastResult();
+                outputProcessorDAO.inactiveLastResult(currentResultList.get(0).getSchemaName());
 
                 Map<String, NumberUpperLimitBreachResult> lastResultMap = classificationToMap(lastResult);
                 for (NumberUpperLimitBreachResult result : currentResultList) {
@@ -49,13 +52,13 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
                     result.setUsePercent(calculateUsePercent(result.getCurrentValue(), result.getLimitValue()));
                     result.setDaysReach80Percent(calculateDaysReach80Percent(result.getBurnRate(), result.getLimitValue()));
                 }
-                outputProcessorDAO.save((String[]) generateInsertSQL(currentResultList).toArray());
+                outputProcessorDAO.save(currentResultList);
             }
 
         } else {
             int middleIndex = (endIndex + startIndex) / threshold;
-            NumberUpperLimitBreachForkJoinOutputExecutor leftExecutor = new NumberUpperLimitBreachForkJoinOutputExecutor(startIndex, middleIndex, fullResultList);
-            NumberUpperLimitBreachForkJoinOutputExecutor rightExecutor = new NumberUpperLimitBreachForkJoinOutputExecutor(middleIndex, endIndex, fullResultList);
+            NumberUpperLimitBreachForkJoinOutputExecutor leftExecutor = new NumberUpperLimitBreachForkJoinOutputExecutor(startIndex, middleIndex, fullResultList, config);
+            NumberUpperLimitBreachForkJoinOutputExecutor rightExecutor = new NumberUpperLimitBreachForkJoinOutputExecutor(middleIndex, endIndex, fullResultList, config);
             invokeAll(leftExecutor, rightExecutor);
         }
     }
@@ -71,26 +74,15 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
         return resultMap;
     }
 
-    private List<String> generateInsertSQL(List<NumberUpperLimitBreachResult> currentResultList) {
-        List<String> sqlList = new ArrayList<>();
-        for (NumberUpperLimitBreachResult result : currentResultList) {
-            String sql = sql_insert_new_result.replace(":schemaName", "'" + result.getSchemaName() + "'")
-                    .replace(":tableName", "'" + result.getTableName() + "'")
-                    .replace(":columnName", "'" + result.getColumnName() + "'")
-                    .replace(":currentValue", result.getCurrentValue() + "")
-                    .replace(":limitValue", "'" + result.getLimitValue() + "'")
-                    .replace(":burnRate", result.getBurnRate() + "")
-                    .replace(":daysReach80%", "'" + result.getDaysReach80Percent() + "'")
-                    .replace(":active", "'" + result.getActive() + "'");
-            sqlList.add(sql);
-        }
-        return sqlList;
-    }
-
     private BigDecimal generateBurnRate(NumberUpperLimitBreachResult lastResult, NumberUpperLimitBreachResult currentResult) {
         BigDecimal lastValue = Optional.ofNullable(lastResult.getCurrentValue()).orElse(BigDecimal.ZERO);
         BigDecimal currentValue = Optional.ofNullable(currentResult.getCurrentValue()).orElse(BigDecimal.ZERO);
-        return currentValue.subtract(lastValue);
+        BigDecimal burnRate = currentValue.subtract(lastValue);
+        if(burnRate.compareTo(BigDecimal.ZERO) > 0) {
+            return currentValue.subtract(lastValue);
+        } else {
+            return BigDecimal.ZERO;
+        }
     }
 
     private String calculateUsePercent(BigDecimal currentValue, String limitValue) {
@@ -132,8 +124,8 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
         }
 
         BigDecimal limitValueNum = new BigDecimal(limitValue);
-
-        long days = limitValueNum.divide(burnRate, 0, BigDecimal.ROUND_HALF_UP).longValue();
+        BigDecimal divided = limitValueNum.divide(burnRate, 0, BigDecimal.ROUND_HALF_UP);
+        long days = divided.compareTo(new BigDecimal(90)) > 0 ? 91 : divided.longValue();
         if(days > 90) {
             return DAYS_REACH_TO_80_PERCENT_MORE_THAN_90;
         } else if(days > 60) {

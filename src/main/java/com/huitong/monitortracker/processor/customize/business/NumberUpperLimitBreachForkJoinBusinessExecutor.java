@@ -1,17 +1,16 @@
 package com.huitong.monitortracker.processor.customize.business;
 
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachBusinessProcessorDAO;
+import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachMetaData;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachResult;
 import com.huitong.monitortracker.entity.OracleColumnType;
-import com.huitong.monitortracker.executor.ForkJoinExecutor;
 import com.huitong.monitortracker.executor.MonitorTrackerApplicationContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 
 public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTask<List<NumberUpperLimitBreachResult>> {
@@ -21,11 +20,13 @@ public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTas
     private int endIndex;
     private List<List<NumberUpperLimitBreachMetaData>> fullMetaDataList;
     private NumberUpperLimitBreachBusinessProcessorDAO businessProcessorDAO;
+    private MonitorTrackerJobDetailConfig config;
 
-    public NumberUpperLimitBreachForkJoinBusinessExecutor(int startIndex, int endIndex, List<List<NumberUpperLimitBreachMetaData>> fullMetaDataList) {
+    public NumberUpperLimitBreachForkJoinBusinessExecutor(int startIndex, int endIndex, List<List<NumberUpperLimitBreachMetaData>> fullMetaDataList, MonitorTrackerJobDetailConfig config) {
         this.startIndex = startIndex;
         this.endIndex = endIndex;
         this.fullMetaDataList = fullMetaDataList;
+        this.config = config;
     }
 
     @Override
@@ -56,8 +57,8 @@ public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTas
             }
         } else {
             int middleIndex = (endIndex + startIndex) / threshold;
-            NumberUpperLimitBreachForkJoinBusinessExecutor lefForkJoin = new NumberUpperLimitBreachForkJoinBusinessExecutor(startIndex, middleIndex, fullMetaDataList);
-            NumberUpperLimitBreachForkJoinBusinessExecutor rightForkJoin = new NumberUpperLimitBreachForkJoinBusinessExecutor(middleIndex, endIndex, fullMetaDataList);
+            NumberUpperLimitBreachForkJoinBusinessExecutor lefForkJoin = new NumberUpperLimitBreachForkJoinBusinessExecutor(startIndex, middleIndex, fullMetaDataList, config);
+            NumberUpperLimitBreachForkJoinBusinessExecutor rightForkJoin = new NumberUpperLimitBreachForkJoinBusinessExecutor(middleIndex, endIndex, fullMetaDataList, config);
 
             invokeAll(lefForkJoin, rightForkJoin);
             resultList.addAll(lefForkJoin.join());
@@ -123,18 +124,27 @@ public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTas
         if(dataPrecision == 0) {
             return result;
         }
-        if(dataPrecision <= dataScale)
+        if(dataPrecision < dataScale)
             return result;
+
         StringBuffer sb = new StringBuffer();
         long length = dataPrecision - dataScale;
-        for (long i = 0; i < length; i++) {
-            sb.append("9");
-        }
-        if(sb.length() > 5) {
-            result = OracleColumnType.NUMBER.getDisplayFormat() + (sb.length() -1);
+        if(length > 0) {
+            for (long i = 0; i < length; i++) {
+                sb.append("9");
+            }
+            if(sb.length() > 5) {
+                result = OracleColumnType.NUMBER.getDisplayFormat() + (sb.length() -1);
+            } else {
+                result = sb.toString();
+            }
         } else {
-            result = sb.toString();
+            for (long i = 0; i < dataPrecision; i++) {
+                sb.append("9");
+            }
+            result = "0." + sb.toString();
         }
+
         return result;
     }
 

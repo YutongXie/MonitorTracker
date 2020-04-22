@@ -3,7 +3,7 @@ package com.huitong.monitortracker.executor;
 public class ExecutorThreadLocal {
     private static ThreadLocal<Object> inputProcessorThreadLocal = new ThreadLocal<>();
     private static ThreadLocal<Object> businessProcessorThreadLocal = new ThreadLocal<>();
-    private static ThreadLocal<Object> alertProcessorThreadLocal = new ThreadLocal<>();
+    private static ThreadLocal<Object> outputProcessorThreadLocal = new ThreadLocal<>();
 
     public static void setInputData(Object obj) {
         inputProcessorThreadLocal.set(obj);
@@ -21,11 +21,11 @@ public class ExecutorThreadLocal {
         return businessProcessorThreadLocal.get();
     }
 
-    public static Object getAlertData() {
-        return alertProcessorThreadLocal.get();
+    public static Object getOutputData() {
+        return outputProcessorThreadLocal.get();
     }
 
-    public static void setAlertData(Object obj) {
-        alertProcessorThreadLocal.set(obj);
+    public static void setOutputData(Object obj) {
+        outputProcessorThreadLocal.set(obj);
     }
 }
