@@ -1,10 +1,7 @@
 package com.huitong.monitortracker.processor.customize.business;
 
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachBusinessProcessorDAO;
-import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
-import com.huitong.monitortracker.entity.NumberUpperLimitBreachMetaData;
-import com.huitong.monitortracker.entity.NumberUpperLimitBreachResult;
-import com.huitong.monitortracker.entity.OracleColumnType;
+import com.huitong.monitortracker.entity.*;
 import com.huitong.monitortracker.executor.MonitorTrackerApplicationContextAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +12,6 @@ import java.util.concurrent.RecursiveTask;
 
 public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTask<List<NumberUpperLimitBreachResult>> {
     private Logger logger = LoggerFactory.getLogger(NumberUpperLimitBreachForkJoinBusinessExecutor.class);
-    private int threshold = 2;
     private int startIndex;
     private int endIndex;
     private List<List<NumberUpperLimitBreachMetaData>> fullMetaDataList;
@@ -32,7 +28,7 @@ public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTas
     @Override
     protected List<NumberUpperLimitBreachResult> compute() {
         List<NumberUpperLimitBreachResult> resultList = new ArrayList<>();
-        if((endIndex - startIndex) < threshold) {
+        if((endIndex - startIndex) < NumberUpperLimitBreachConstants.FORK_JOIN_EXECUTOR_THRESHOLD.getValueAsNumber()) {
             initialResource();
             for (int i = startIndex; i < endIndex; i++) {
                 List<NumberUpperLimitBreachMetaData> metaDataList = fullMetaDataList.get(i);
@@ -56,7 +52,7 @@ public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTas
                 });
             }
         } else {
-            int middleIndex = (endIndex + startIndex) / threshold;
+            int middleIndex = (endIndex + startIndex) / NumberUpperLimitBreachConstants.FORK_JOIN_EXECUTOR_THRESHOLD.getValueAsNumber();
             NumberUpperLimitBreachForkJoinBusinessExecutor lefForkJoin = new NumberUpperLimitBreachForkJoinBusinessExecutor(startIndex, middleIndex, fullMetaDataList, config);
             NumberUpperLimitBreachForkJoinBusinessExecutor rightForkJoin = new NumberUpperLimitBreachForkJoinBusinessExecutor(middleIndex, endIndex, fullMetaDataList, config);
 

@@ -3,6 +3,7 @@ package com.huitong.monitortracker.processor.customize.output;
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachBusinessProcessorDAO;
 import com.huitong.monitortracker.dao.NumberUpperLimitBreachOutputProcessorDAO;
 import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
+import com.huitong.monitortracker.entity.NumberUpperLimitBreachConstants;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +15,7 @@ import java.util.concurrent.RecursiveAction;
 
 public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveAction {
     private Logger logger = LoggerFactory.getLogger(NumberUpperLimitBreachForkJoinOutputExecutor.class);
-    private final String DAYS_REACH_TO_80_PERCENT_MORE_THAN_90 = "> 90";
-    private final String DAYS_REACH_TO_80_PERCENT_MORE_THAN_60 = "> 60";
-    private final String DAYS_REACH_TO_80_PERCENT_MORE_THAN_30 = "> 30";
-    private final String DAYS_REACH_TO_80_PERCENT_MORE_THAN_15 = "> 15";
-    private final String DAYS_REACH_TO_80_PERCENT_LESS_THAN_15 = "< 15";
 
-    private int threshold = 2;
     private int startIndex;
     private int endIndex;
     private List<List<NumberUpperLimitBreachResult>> fullResultList;
@@ -39,7 +34,7 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
 
     @Override
     protected void compute() {
-        if((endIndex - startIndex) < threshold) {
+        if((endIndex - startIndex) < NumberUpperLimitBreachConstants.FORK_JOIN_EXECUTOR_THRESHOLD.getValueAsNumber()) {
             for (int i = startIndex; i < endIndex; i++) {
                 List<NumberUpperLimitBreachResult> currentResultList = fullResultList.get(i);
                 List<NumberUpperLimitBreachResult> lastResult = outputProcessorDAO.getLastResult();
@@ -56,7 +51,7 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
             }
 
         } else {
-            int middleIndex = (endIndex + startIndex) / threshold;
+            int middleIndex = (endIndex + startIndex) / NumberUpperLimitBreachConstants.FORK_JOIN_EXECUTOR_THRESHOLD.getValueAsNumber();
             NumberUpperLimitBreachForkJoinOutputExecutor leftExecutor = new NumberUpperLimitBreachForkJoinOutputExecutor(startIndex, middleIndex, fullResultList, config);
             NumberUpperLimitBreachForkJoinOutputExecutor rightExecutor = new NumberUpperLimitBreachForkJoinOutputExecutor(middleIndex, endIndex, fullResultList, config);
             invokeAll(leftExecutor, rightExecutor);
@@ -107,11 +102,11 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
 
     private String calculateDaysReach80Percent(BigDecimal burnRate, String limitValue) {
         if(BigDecimal.ZERO.compareTo(burnRate) == 0) {
-            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_90;
+            return NumberUpperLimitBreachConstants.DAYS_REACH_TO_80_PERCENT_MORE_THAN_90.getValue();
         }
 
         if("0".equalsIgnoreCase(limitValue)) {
-            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_90;
+            return NumberUpperLimitBreachConstants.DAYS_REACH_TO_80_PERCENT_MORE_THAN_90.getValue();
         }
         if(limitValue.contains("9.99...")) {
             int index = limitValue.indexOf("E");
@@ -127,15 +122,15 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
         BigDecimal divided = limitValueNum.divide(burnRate, 0, BigDecimal.ROUND_HALF_UP);
         long days = divided.compareTo(new BigDecimal(90)) > 0 ? 91 : divided.longValue();
         if(days > 90) {
-            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_90;
+            return NumberUpperLimitBreachConstants.DAYS_REACH_TO_80_PERCENT_MORE_THAN_90.getValue();
         } else if(days > 60) {
-            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_60;
+            return NumberUpperLimitBreachConstants.DAYS_REACH_TO_80_PERCENT_MORE_THAN_60.getValue();
         } else if(days > 30) {
-            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_30;
+            return NumberUpperLimitBreachConstants.DAYS_REACH_TO_80_PERCENT_MORE_THAN_30.getValue();
         } else if(days >= 15) {
-            return DAYS_REACH_TO_80_PERCENT_MORE_THAN_15;
+            return NumberUpperLimitBreachConstants.DAYS_REACH_TO_80_PERCENT_MORE_THAN_15.getValue();
         } else {
-            return DAYS_REACH_TO_80_PERCENT_LESS_THAN_15;
+            return NumberUpperLimitBreachConstants.DAYS_REACH_TO_80_PERCENT_LESS_THAN_15.getValue();
         }
     }
 }
