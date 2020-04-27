@@ -30,19 +30,10 @@ public class MonitorTrackerExecutor implements ApplicationRunner {
     private void execute() {
         //1. get job config from DB
         List<MonitorTrackerJobConfigs> jobConfigsList = getJobConfig();
-        for (MonitorTrackerJobConfigs monitorTrackerJobConfigs : jobConfigsList) {
-            List<MonitorTrackerJobDetailConfig> detailConfigList = getJobDetailConfig(monitorTrackerJobConfigs.getJobId());
-            //2. Initial processor base on Job config
-            try {
-                initialProcess(monitorTrackerJobConfigs);
-                inputProcessor.execute(MonitorTrackerConfigurationUtils.getInputProcessorJobDetailConfig(detailConfigList));
-                businessProcessor.execute(MonitorTrackerConfigurationUtils.getBusinessProcessorJobDetailConfig(detailConfigList));
-                outputProcessor.execute(MonitorTrackerConfigurationUtils.getOutputProcessorJobDetailConfig(detailConfigList));
-                if(alertProcessor != null)
-                    alertProcessor.execute(MonitorTrackerConfigurationUtils.getAlertProcessorJobDetailConfig(detailConfigList));
-            } catch (Exception ex) {
-                logger.error("Execute Monitor Tracker job failed. JobConfig is:{}, exception:{}", monitorTrackerJobConfigs.toString(), ex);
-            }
+        for (MonitorTrackerJobConfigs jobConfig : jobConfigsList) {
+            List<MonitorTrackerJobDetailConfig> detailConfigList = getJobDetailConfig(jobConfig.getJobId());
+            MonitorTrackerJobExecutor jobExecutor = new MonitorTrackerJobExecutor(jobConfig, detailConfigList);
+            jobExecutor.execute();
         }
     }
 
@@ -52,43 +43,6 @@ public class MonitorTrackerExecutor implements ApplicationRunner {
 
     private List<MonitorTrackerJobDetailConfig> getJobDetailConfig(long jobId) {
         return configurationDAO.getJobDetailConfig(jobId);
-    }
-
-    private void initialProcess(MonitorTrackerJobConfigs monitorTrackerJobConfigs) throws Exception {
-        String inputProcessorName = monitorTrackerJobConfigs.getInputProcessor();
-        String businessProcessorName = monitorTrackerJobConfigs.getBusinessProcessor();
-        String outputProcessorName = monitorTrackerJobConfigs.getOutputProcessor();
-        String alertProcessorName = monitorTrackerJobConfigs.getAlertProcessor();
-
-        if(StringUtils.isNotBlank(inputProcessorName)) {
-            inputProcessor = (InputProcessor) MonitorTrackerApplicationContextAware.getBean(inputProcessorName);
-            if(inputProcessor == null)
-                throw new Exception("Invalid InputProcessor setup");
-        } else {
-            throw new Exception("Missing InputProcessor setup");
-        }
-
-        if(StringUtils.isNotBlank(businessProcessorName)) {
-            businessProcessor = (BusinessProcessor) MonitorTrackerApplicationContextAware.getBean(businessProcessorName);
-            if(businessProcessor == null)
-                throw new Exception("Invalid BusinessProcessor setup");
-        } else {
-            throw new Exception("Missing BusinessProcessor setup");
-        }
-
-        if(StringUtils.isNotBlank(outputProcessorName)) {
-            outputProcessor = (OutputProcessor) MonitorTrackerApplicationContextAware.getBean(outputProcessorName);
-            if(outputProcessor == null)
-                throw new Exception("Invalid OutputProcessor setup");
-        } else {
-            throw new Exception("Missing OutputProcessor setup");
-        }
-
-        if(StringUtils.isNotBlank(alertProcessorName)) {
-            alertProcessor = (AlertProcessor) MonitorTrackerApplicationContextAware.getBean(alertProcessorName);
-            if(alertProcessor == null)
-                throw new Exception("Invalid AlertProcessor setup");
-        }
     }
 
     @Override
