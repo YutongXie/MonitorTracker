@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.RecursiveTask;
+import java.util.stream.Collectors;
 
 public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTask<List<NumberUpperLimitBreachResult>> {
     private Logger logger = LoggerFactory.getLogger(NumberUpperLimitBreachForkJoinBusinessExecutor.class);
@@ -71,18 +72,7 @@ public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTas
     }
 
     public Map<String, List<NumberUpperLimitBreachMetaData>> classificationToMap(List<NumberUpperLimitBreachMetaData> metaDataList) {
-        Map<String, List<NumberUpperLimitBreachMetaData>> metaDataMap = new HashMap<>();
-        for (NumberUpperLimitBreachMetaData metaData : metaDataList) {
-            String key = metaData.getSchemaName() + "_" + metaData.getTableName();
-            if(metaDataMap.containsKey(key)) {
-                metaDataMap.get(key).add(metaData);
-            } else {
-                List<NumberUpperLimitBreachMetaData> list = new ArrayList<>();
-                list.add(metaData);
-                metaDataMap.put(key, list);
-            }
-        }
-        return metaDataMap;
+        return metaDataList.stream().collect(Collectors.groupingBy(metaData -> metaData.getSchemaName() + "_" + metaData.getTableName()));
     }
 
     private BigDecimal convertToDecimal(String columnCurrentValueStr) {

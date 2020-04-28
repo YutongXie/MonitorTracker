@@ -17,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -64,17 +65,6 @@ public class NumberUpperLimitBreachBusinessProcessor implements BusinessProcesso
     }
 
     public Map<String, List<NumberUpperLimitBreachMetaData>> classificationToMap(List<NumberUpperLimitBreachMetaData> metaDataList) {
-        Map<String, List<NumberUpperLimitBreachMetaData>> metaDataMap = new HashMap<>();
-        for (NumberUpperLimitBreachMetaData metaData : metaDataList) {
-            String key = metaData.getSchemaName();
-            if(metaDataMap.containsKey(key)) {
-                metaDataMap.get(key).add(metaData);
-            } else {
-                List<NumberUpperLimitBreachMetaData> list = new ArrayList<>();
-                list.add(metaData);
-                metaDataMap.put(key, list);
-            }
-        }
-        return metaDataMap;
+        return metaDataList.stream().collect(Collectors.groupingBy(NumberUpperLimitBreachMetaData::getSchemaName));
     }
 }

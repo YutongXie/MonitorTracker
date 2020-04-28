@@ -17,6 +17,8 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
+
 @Component
 @Slf4j
 public class NumberUpperLimitBreachOutputProcessor implements OutputProcessor {
@@ -60,18 +62,7 @@ public class NumberUpperLimitBreachOutputProcessor implements OutputProcessor {
     }
 
     public Map<String, List<NumberUpperLimitBreachResult>> classificationToMap(List<NumberUpperLimitBreachResult> resultList) {
-        Map<String, List<NumberUpperLimitBreachResult>> metaDataMap = new HashMap<>();
-        for (NumberUpperLimitBreachResult result : resultList) {
-            String key = result.getSchemaName();
-            if(metaDataMap.containsKey(key)) {
-                metaDataMap.get(key).add(result);
-            } else {
-                List<NumberUpperLimitBreachResult> list = new ArrayList<>();
-                list.add(result);
-                metaDataMap.put(key, list);
-            }
-        }
-        return metaDataMap;
+        return resultList.stream().collect(Collectors.groupingBy(NumberUpperLimitBreachResult::getSchemaName));
     }
 
 }

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.RecursiveAction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveAction {
     private Logger logger = LoggerFactory.getLogger(NumberUpperLimitBreachForkJoinOutputExecutor.class);
@@ -59,14 +61,8 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
     }
 
     public Map<String, NumberUpperLimitBreachResult> classificationToMap(List<NumberUpperLimitBreachResult> resultList) {
-        Map<String, NumberUpperLimitBreachResult> resultMap = new HashMap<>();
-        for (NumberUpperLimitBreachResult result : resultList) {
-            String key = result.getSchemaName() + "_" + result.getTableName() + "_" + result.getColumnName();
-            if(!resultMap.containsKey(key)) {
-                resultMap.put(key, result);
-            }
-        }
-        return resultMap;
+        return resultList.stream()
+                .collect(Collectors.toMap(result -> result.getSchemaName() + "_" + result.getTableName() + "_" + result.getColumnName(), Function.identity()));
     }
 
     private BigDecimal generateBurnRate(NumberUpperLimitBreachResult lastResult, NumberUpperLimitBreachResult currentResult) {
@@ -82,9 +78,9 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
 
     private String calculateUsePercent(BigDecimal currentValue, String limitValue) {
         if(BigDecimal.ZERO.compareTo(currentValue) == 0)
-            return "0.00%";
+            return NumberUpperLimitBreachConstants.USE_PERCENT_DEFAULT_VALUE.getValue();
         if("0".equalsIgnoreCase(limitValue)) {
-            return "0.00%";
+            return NumberUpperLimitBreachConstants.USE_PERCENT_DEFAULT_VALUE.getValue();
         }
         if(limitValue.contains("9.99...")) {
             int index = limitValue.indexOf("E");
