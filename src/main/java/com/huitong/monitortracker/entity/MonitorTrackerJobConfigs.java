@@ -19,6 +19,8 @@ public class MonitorTrackerJobConfigs {
     private Long jobId;
     @Column(name = "JOB_NAME")
     private String jobName;
+    @Column(name = "JOB_DESC")
+    private String jobDesc;
     @Column(name = "INPUT_PROCESSOR")
     private String inputProcessor;
     @Column(name = "BUSINESS_PROCESSOR")

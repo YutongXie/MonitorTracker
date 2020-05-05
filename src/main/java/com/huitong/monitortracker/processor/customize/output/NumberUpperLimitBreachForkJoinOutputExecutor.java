@@ -116,7 +116,8 @@ public class NumberUpperLimitBreachForkJoinOutputExecutor extends RecursiveActio
 
         BigDecimal limitValueNum = new BigDecimal(limitValue);
         BigDecimal divided = limitValueNum.divide(burnRate, 0, BigDecimal.ROUND_HALF_UP);
-        long days = divided.compareTo(new BigDecimal(90)) > 0 ? 91 : divided.longValue();
+        long days = divided.compareTo(new BigDecimal(90)) > 0
+                ? NumberUpperLimitBreachConstants.MAGIC_NUMBER_DAYS_REACH_TO_WARNING_LINE_MORE_THAN_90.getValueAsNumber() : divided.longValue();
         if(days > 90) {
             return NumberUpperLimitBreachConstants.DAYS_REACH_TO_80_PERCENT_MORE_THAN_90.getValue();
         } else if(days > 60) {

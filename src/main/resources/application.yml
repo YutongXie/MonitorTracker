@@ -1,33 +1,33 @@
 spring:
-#  datasource:
-#    jobconfig:
-#      driverClassName:
-#      jdbc-url:
-#      username:
-#      password:
-#      maximum-pool-size: 5
-#      minimum-pool-size: 2
-#    inputprocessor:
-#      driverClassName:
-#      jdbc-url:
-#      username:
-#      password:
-#      maximum-pool-size: 5
-#      minimum-pool-size: 2
-#    outputprocessor:
-#      driverClassName:
-#      jdbc-url:
-#      username:
-#      password:
-#      maximum-pool-size: 5
-#      minimum-pool-size: 2
-#    businessprocessor:
-#      driverClassName:
-#      jdbc-url:
-#      username:
-#      password:
-#      maximum-pool-size: 5
-#      minimum-pool-size: 2
+  datasource:
+    jobconfig:
+      driverClassName:
+      jdbc-url:
+      username:
+      password:
+      maximum-pool-size: 5
+      minimum-pool-size: 2
+    inputprocessor:
+      driverClassName:
+      jdbc-url:
+      username:
+      password:
+      maximum-pool-size: 5
+      minimum-pool-size: 2
+    outputprocessor:
+      driverClassName:
+      jdbc-url:
+      username:
+      password:
+      maximum-pool-size: 5
+      minimum-pool-size: 2
+    businessprocessor:
+      driverClassName:
+      jdbc-url:
+      username:
+      password:
+      maximum-pool-size: 5
+      minimum-pool-size: 2
   mail:
     username:
     password:
@@ -57,5 +57,5 @@ sql:
     number_upper_limit_breach:
       get_last_result: SELECT * FROM NUMBER_UPPER_LIMIT_BREACH WHERE ACTIVE = 'A' AND SCHEMA_NAME = ?
       inactive_old_result: UPDATE NUMBER_UPPER_LIMIT_BREACH SET ACTIVE = 'I' WHERE ACTIVE = 'A' and SCHEMA_NAME = ?
-      insert_new_result: "INSERT INTO NUMBER_UPPER_LIMIT_BREACH(SCHEMA_NAME, TABLE_NAME, COLUMN_NAME, CURRENT_VALUE, LIMIT_VALUE,
-                          BURN_RATE, DAYS_REACH_80, STATUS, CREATE_TIME) VALUES(?, ?, ?, ?, ?, ?, ?, 'A', sysdate)"
+      insert_new_result: "INSERT INTO NUMBER_UPPER_LIMIT_BREACH(SCHEMA_NAME, TABLE_NAME, COLUMN_NAME, COLUMN_DATA_TYPE, CURRENT_VALUE, LIMIT_VALUE,
+                          BURN_RATE, DAYS_REACH_80_PERCENT, STATUS, CREATE_TIME) VALUES(?, ?, ?, ?, ?, ?, ?, ?, 'A', sysdate)"

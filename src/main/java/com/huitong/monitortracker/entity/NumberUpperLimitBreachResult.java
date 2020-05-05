@@ -13,6 +13,7 @@ public class NumberUpperLimitBreachResult {
     private String schemaName;
     private String tableName;
     private String columnName;
+    private String columnDataType;
     private BigDecimal currentValue;
     private String limitValue;
     private BigDecimal burnRate;

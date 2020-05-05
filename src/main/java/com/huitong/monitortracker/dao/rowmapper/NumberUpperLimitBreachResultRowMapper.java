@@ -13,6 +13,7 @@ public class NumberUpperLimitBreachResultRowMapper implements RowMapper {
         result.setSchemaName(resultSet.getString("SCHEMA_NAME"));
         result.setTableName(resultSet.getString("TABLE_NAME"));
         result.setColumnName(resultSet.getString("COLUMN_NAME"));
+        result.setColumnDataType(resultSet.getString("COLUMN_DATA_TYPE"));
         result.setActive(resultSet.getString("ACTIVE"));
         result.setCurrentValue(resultSet.getBigDecimal("CURRENT_VALUE"));
         result.setLimitValue(resultSet.getString("LIMIT_VALUE"));

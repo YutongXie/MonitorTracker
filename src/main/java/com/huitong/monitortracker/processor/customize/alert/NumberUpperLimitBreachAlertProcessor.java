@@ -75,6 +75,10 @@ public class NumberUpperLimitBreachAlertProcessor implements AlertProcessor {
         sendEmail(config, alertData);
     }
 
+    private void transformRecipients(String recipient) {
+
+    }
+
     private List<NumberUpperLimitBreachResult> getInputData() {
         List<NumberUpperLimitBreachResult> inputData = new ArrayList<>();
         Object obj = ExecutorThreadLocal.getInputData();

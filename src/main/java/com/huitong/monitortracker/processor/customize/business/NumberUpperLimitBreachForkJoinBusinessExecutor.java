@@ -47,6 +47,7 @@ public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTas
                         result.setColumnName(columnName);
                         result.setCurrentValue(convertToDecimal(columnValue));
                         result.setLimitValue(getLimitValue(value, columnName));
+                        result.setColumnDataType(getColumnDataType(value, columnName));
                         result.setActive("A");
                         resultList.add(result);
                     }
@@ -103,6 +104,28 @@ public class NumberUpperLimitBreachForkJoinBusinessExecutor extends RecursiveTas
             }
         }
         return "0";
+    }
+
+    private String getColumnDataType(List<NumberUpperLimitBreachMetaData> metaDataList, String columnName) {
+        for (NumberUpperLimitBreachMetaData metaData : metaDataList) {
+            if (columnName.equalsIgnoreCase(metaData.getColumnName())) {
+                String dataType = metaData.getDataType();
+                if(OracleColumnType.BINARY_DOUBLE.name().equalsIgnoreCase(dataType)) {
+                    return OracleColumnType.BINARY_DOUBLE.name();
+                } else if(OracleColumnType.BINARY_FLOAT.name().equalsIgnoreCase(dataType)) {
+                    return OracleColumnType.BINARY_FLOAT.name();
+                } else if(OracleColumnType.FLOAT.name().equalsIgnoreCase(dataType)) {
+                    return OracleColumnType.FLOAT.name();
+                } else if(OracleColumnType.NUMBER.name().equalsIgnoreCase(dataType)) {
+                    Long dataScale = Optional.ofNullable(metaData.getDataScale()).orElse(0L);
+                    Long dataPrecision = Optional.ofNullable(metaData.getDataPrecision()).orElse(0L);
+                    return OracleColumnType.NUMBER.name() + "(" + dataPrecision + "," + dataScale + ")";
+                } else {
+                    return dataType;
+                }
+            }
+        }
+        return "UNKNOWN";
     }
 
     private String generateLimitValueForNumberType(Long dataPrecision, Long dataScale) {

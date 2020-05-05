@@ -52,10 +52,11 @@ public class NumberUpperLimitBreachOutputProcessorDAOImpl implements NumberUpper
                ps.setString(1, resultList.get(i).getSchemaName());
                ps.setString(2, resultList.get(i).getTableName());
                ps.setString(3, resultList.get(i).getColumnName());
-               ps.setBigDecimal(4, resultList.get(i).getCurrentValue());
-               ps.setString(5, resultList.get(i).getLimitValue());
-               ps.setBigDecimal(6, resultList.get(i).getBurnRate());
-               ps.setString(7, resultList.get(i).getDaysReach80Percent());
+               ps.setString(4, resultList.get(i).getColumnDataType());
+               ps.setBigDecimal(5, resultList.get(i).getCurrentValue());
+               ps.setString(6, resultList.get(i).getLimitValue());
+               ps.setBigDecimal(7, resultList.get(i).getBurnRate());
+               ps.setString(8, resultList.get(i).getDaysReach80Percent());
            }
 
            @Override

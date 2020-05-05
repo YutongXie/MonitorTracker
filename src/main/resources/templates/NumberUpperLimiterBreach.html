@@ -11,6 +11,8 @@
             <th>Schema Name</th>
             <th>Table Name</th>
             <th>Column Name</th>
+            <th>Column Data Type</th>
+            <th>Current Max Value</th>
             <th>Burn Rate</th>
             <th>Use Percent</th>
             <th>Days Reach to 80%</th>
@@ -19,6 +21,8 @@
             <td th:text="${result.schemaName}"></td>
             <td th:text="${result.tableName}"></td>
             <td th:text="${result.columnName}"></td>
+            <td th:text="${result.columnDataType}"></td>
+            <td th:text="${result.currentValue}"></td>
             <td th:text="${result.burnRate}"></td>
             <td th:text="${result.usePercent}"></td>
             <td th:text="${result.daysReach80Percent}"></td>

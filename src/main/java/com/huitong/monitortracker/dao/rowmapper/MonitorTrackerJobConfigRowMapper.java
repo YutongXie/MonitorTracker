@@ -12,6 +12,7 @@ public class MonitorTrackerJobConfigRowMapper implements RowMapper {
         MonitorTrackerJobConfigs config = new MonitorTrackerJobConfigs();
         config.setJobId(resultSet.getLong("JOB_ID"));
         config.setJobName(resultSet.getString("JOB_NAME"));
+        config.setJobDesc(resultSet.getString("JOB_DESC"));
         config.setInputProcessor(resultSet.getString("INPUT_PROCESSOR"));
         config.setBusinessProcessor(resultSet.getString("BUSINESS_PROCESSOR"));
         config.setOutputProcessor(resultSet.getString("OUTPUT_PROCESSOR"));
