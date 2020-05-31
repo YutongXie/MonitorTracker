@@ -1,31 +1,31 @@
 spring:
   datasource:
     jobconfig:
-      driverClassName:
-      jdbc-url:
-      username:
-      password:
+      driverClassName: com.mysql.jdbc.Driver
+      jdbc-url: jdbc:mysql://localhost:3306/fly?serverTimezone=UTC
+      username: root
+      password: *
       maximum-pool-size: 5
       minimum-pool-size: 2
     inputprocessor:
-      driverClassName:
-      jdbc-url:
-      username:
-      password:
+      driverClassName: com.mysql.jdbc.Driver
+      jdbc-url: jdbc:mysql://localhost:3306/fly?serverTimezone=UTC
+      username: root
+      password: *
       maximum-pool-size: 5
       minimum-pool-size: 2
     outputprocessor:
-      driverClassName:
-      jdbc-url:
-      username:
-      password:
+      driverClassName: com.mysql.jdbc.Driver
+      jdbc-url: jdbc:mysql://localhost:3306/fly?serverTimezone=UTC
+      username: root
+      password: *
       maximum-pool-size: 5
       minimum-pool-size: 2
     businessprocessor:
-      driverClassName:
-      jdbc-url:
-      username:
-      password:
+      driverClassName: com.mysql.jdbc.Driver
+      jdbc-url: jdbc:mysql://localhost:3306/fly?serverTimezone=UTC
+      username: root
+      password: *
       maximum-pool-size: 5
       minimum-pool-size: 2
   mail:
@@ -45,6 +45,8 @@ spring:
     encoding: UTF-8
     content-type: text/html
     mode: HTML5
+global:
+  env: SIT
 sql:
   job_config:
     parent: SELECT * from MONITOR_TRACKER_JOB_CONFIG
