@@ -43,7 +43,8 @@ public class MonitorTrackerExecutor implements ApplicationRunner {
     }
 
     private List<MonitorTrackerJobDetailConfig> getJobDetailConfig(long jobId) {
-        return configurationDAO.getJobDetailConfig(jobId);
+//        return configurationDAO.getJobDetailConfig(jobId);
+        return configMapper.getJobDetailConfig(jobId);
     }
 
     @Override

@@ -23,4 +23,15 @@ public class MybatisConfig {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 
+    @Bean(name="businessSqlSessionFactory")
+    public SqlSessionFactory businessSqlSessionFactory(@Qualifier("businessProcessorDataSource") DataSource dataSource) throws Exception {
+        SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
+        sessionFactoryBean.setDataSource(dataSource);
+        return sessionFactoryBean.getObject();
+    }
+    @Bean(name="businessSqlSessionTemplate")
+    public SqlSessionTemplate businessSqlSessionTemplate(@Qualifier("businessSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory);
+    }
+
 }

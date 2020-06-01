@@ -1,6 +1,8 @@
 package com.huitong.monitortracker.dao.mybatis;
 
 import com.huitong.monitortracker.entity.MonitorTrackerJobConfigs;
+import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -23,5 +25,16 @@ public interface ConfigMapper {
             @Result(column = "LAST_UPDATE_TIME", property = "lastUpdateTime")
     })
     List<MonitorTrackerJobConfigs> getJobConfig();
-//    List<MonitorTrackerJobDetailConfig> getJobDetailConfig(long jobId);
+
+    @SelectProvider(type = MonitorTrackerSelectSqlProvider.class, method = "getJobDetailConfigSql")
+    @Results({
+            @Result(column = "JOB_ID", property = "jobId"),
+            @Result(column = "PROCESS_NAME", property = "processorName"),
+            @Result(column = "TYPE", property = "type"),
+            @Result(column = "VALUE1", property = "value1"),
+            @Result(column = "VALUE2", property = "value2"),
+            @Result(column = "VALUE3", property = "value3"),
+            @Result(column = "VALUE4", property = "value4"),
+    })
+    List<MonitorTrackerJobDetailConfig> getJobDetailConfig(@Param("jobId") long jobId);
 }
