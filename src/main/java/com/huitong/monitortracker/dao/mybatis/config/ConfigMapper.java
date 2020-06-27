@@ -1,5 +1,6 @@
-package com.huitong.monitortracker.dao.mybatis;
+package com.huitong.monitortracker.dao.mybatis.config;
 
+import com.huitong.monitortracker.dao.mybatis.MonitorTrackerSelectSqlProvider;
 import com.huitong.monitortracker.entity.MonitorTrackerJobConfigs;
 import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
 import org.apache.ibatis.annotations.Param;

@@ -1,5 +1,6 @@
-package com.huitong.monitortracker.dao.mybatis;
+package com.huitong.monitortracker.dao.mybatis.output;
 
+import com.huitong.monitortracker.dao.mybatis.MonitorTrackerSelectSqlProvider;
 import com.huitong.monitortracker.entity.NumberUpperLimitBreachResult;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;

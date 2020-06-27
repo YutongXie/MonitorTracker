@@ -5,29 +5,29 @@ spring:
       jdbc-url: jdbc:mysql://localhost:3306/fly?serverTimezone=UTC
       username: root
       password: *
-      maximum-pool-size: 5
-      minimum-pool-size: 2
+      maximumPoolSize: 5
+      minimumIdle: 2
     inputprocessor:
       driverClassName: com.mysql.jdbc.Driver
       jdbc-url: jdbc:mysql://localhost:3306/fly?serverTimezone=UTC
       username: root
       password: *
-      maximum-pool-size: 5
-      minimum-pool-size: 2
+      maximumPoolSize: 5
+      minimumIdle: 2
     outputprocessor:
       driverClassName: com.mysql.jdbc.Driver
       jdbc-url: jdbc:mysql://localhost:3306/fly?serverTimezone=UTC
       username: root
       password: *
-      maximum-pool-size: 5
-      minimum-pool-size: 2
+      maximumPoolSize: 15
+      minimumIdle: 10
     businessprocessor:
       driverClassName: com.mysql.jdbc.Driver
       jdbc-url: jdbc:mysql://localhost:3306/fly?serverTimezone=UTC
       username: root
       password: *
-      maximum-pool-size: 5
-      minimum-pool-size: 2
+      maximumPoolSize: 15
+      minimumIdle: 10
   mail:
     username:
     password:

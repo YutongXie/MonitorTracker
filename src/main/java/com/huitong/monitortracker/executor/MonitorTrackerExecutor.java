@@ -1,7 +1,7 @@
 package com.huitong.monitortracker.executor;
 
 import com.huitong.monitortracker.dao.ConfigurationDAO;
-import com.huitong.monitortracker.dao.mybatis.ConfigMapper;
+import com.huitong.monitortracker.dao.mybatis.config.ConfigMapper;
 import com.huitong.monitortracker.entity.MonitorTrackerJobConfigs;
 import com.huitong.monitortracker.entity.MonitorTrackerJobDetailConfig;
 import com.huitong.monitortracker.processor.AlertProcessor;
